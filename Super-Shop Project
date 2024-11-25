@@ -189,6 +189,45 @@ void add_to_cart(int user_id) {
     printf("Product not found or insufficient quantity.\n");
 }
 
+void remove_from_cart(int user_id) {
+    int product_id, found = 0;
+    printf("Enter product ID to remove from cart: ");
+    scanf("%d", &product_id);
+
+    for (int i = 0; i < user_count; i++) {
+        if (users[i].id == user_id) {
+            for (int j = 0; j < users[i].cart_count; j++) {
+                if (users[i].cart_items[j] == product_id) {
+                    // Restore product quantity to inventory
+                    for (int k = 0; k < product_count; k++) {
+                        if (products[k].id == product_id) {
+                            products[k].available += users[i].cart_quantities[j];
+                            break;
+                        }
+                    }
+
+                    // Shift the remaining cart items left
+                    for (int k = j; k < users[i].cart_count - 1; k++) {
+                        users[i].cart_items[k] = users[i].cart_items[k + 1];
+                        users[i].cart_quantities[k] = users[i].cart_quantities[k + 1];
+                    }
+
+                    users[i].cart_count--;
+                    save_data("products.dat", products, product_count, sizeof(Product));
+                    save_data("users.dat", users, user_count, sizeof(User));
+                    printf("Product removed from cart.\n");
+                    found = 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!found) {
+        printf("Product not found in your cart.\n");
+    }
+}
+
 void view_cart(int user_id) {
     float total = 0;
     printf("\nYour shopping cart:\nID\tName\tPrice\tQuantity\tTotal\n");
@@ -199,40 +238,38 @@ void view_cart(int user_id) {
                 for (int k = 0; k < product_count; k++) {
                     if (products[k].id == prod_id) {
                         float item_total = products[k].price * qty;
-                        printf("%d\t%s\t%.2f\t%d\t%.2f\n", products[k].id, products[k].name, products[k].price, qty, item_total);
+                        printf("%d\t%s\t%.2f\t%d\t%.2f\n", prod_id, products[k].name, products[k].price, qty, item_total);
                         total += item_total;
-                        break;
                     }
                 }
             }
-            printf("Total: %.2f\n", total);
-            return;
         }
     }
-    printf("Cart not found.\n");
+    printf("Total Amount: %.2f\n", total);
 }
 
 void checkout(int user_id) {
-    view_cart(user_id);
     for (int i = 0; i < user_count; i++) {
         if (users[i].id == user_id) {
-            users[i].cart_count = 0;
-            printf("Order placed.\n");
+            users[i].cart_count = 0; // Empty the cart
+            save_data("users.dat", users, user_count, sizeof(User));
+            printf("Checkout successful. Thank you for your purchase!\n");
+            break;
         }
     }
-    save_data("users.dat", users, user_count, sizeof(User));
 }
 
 void customer_menu(int user_id) {
     int choice;
     do {
-        printf("\n1. View Products\n2. Add to Cart\n3. View Cart\n4. Checkout\n0. Logout\nChoice: ");
+        printf("\n1. View Products\n2. Add to Cart\n3. View Cart\n4. Remove from Cart\n5. Checkout\n0. Logout\nChoice: ");
         scanf("%d", &choice);
         switch (choice) {
             case 1: search_products(1); break;
             case 2: add_to_cart(user_id); break;
             case 3: view_cart(user_id); break;
-            case 4: checkout(user_id); break;
+            case 4: remove_from_cart(user_id); break;
+            case 5: checkout(user_id); break;
         }
     } while (choice != 0);
 }
@@ -240,7 +277,7 @@ void customer_menu(int user_id) {
 void admin_menu() {
     int choice;
     do {
-        printf("\n1. Add Product\n2. Update Product\n3. Remove Product\n4. Search Products\n0. Logout\nChoice: ");
+        printf("\n1. Add Product\n2. Update Product\n3. Remove Product\n4. View Products\n0. Logout\nChoice: ");
         scanf("%d", &choice);
         switch (choice) {
             case 1: add_product(); break;
@@ -251,25 +288,26 @@ void admin_menu() {
     } while (choice != 0);
 }
 
-void main_menu() {
-    int choice, logged_user_id;
-    do {
-        printf("\nWelcome to the Super Shop!\n1. Register\n2. Login as Customer\n3. Login as Admin\n0. Exit\nChoice: ");
-        scanf("%d", &choice);
-        switch (choice) {
-            case 1: register_user(); break;
-            case 2: if ((logged_user_id = login()) > 0) customer_menu(logged_user_id); else printf("Login failed.\n"); break;
-            case 3: admin_menu(); break;
-        }
-    } while (choice != 0);
-    save_data("products.dat", products, product_count, sizeof(Product));
-    save_data("users.dat", users, user_count, sizeof(User));
-}
-
 int main() {
     load_data("products.dat", products, &product_count, sizeof(Product));
     load_data("users.dat", users, &user_count, sizeof(User));
     load_initial_products();
-    main_menu();
+
+    int choice;
+    do {
+        printf("\n1. Register\n2. Login\n3. Admin Login\n0. Exit\nChoice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1: register_user(); break;
+            case 2: {
+                int user_id = login();
+                if (user_id != -1) customer_menu(user_id);
+                else printf("Invalid credentials.\n");
+                break;
+            }
+            case 3: admin_menu(); break;
+        }
+    } while (choice != 0);
+
     return 0;
 }
