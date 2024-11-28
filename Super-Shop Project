@@ -70,8 +70,10 @@ void add_product() {
     scanf(" %[^\n]", p->name);
     printf("Enter description: ");
     scanf(" %[^\n]", p->description);
-    printf("Enter price and quantity: ");
-    scanf("%f %d", &p->price, &p->quantity);
+    printf("Enter price: ");
+    scanf("%f %d", &p->price);
+    printf("Enter quantity: ");
+    scanf("%f %d",&p->quantity);
     p->available = p->quantity;
     save_data("products.dat", products, product_count, sizeof(Product));
 }
@@ -282,15 +284,25 @@ void admin_menu() {
         printf("\n1. Add Product\n2. Update Product\n3. Remove Product\n4. View Products\n0. Logout\nChoice: ");
         scanf("%d", &choice);
         switch (choice) {
-            case 1: add_product(); break;
-            case 2: update_product(); break;
-            case 3: remove_product(); break;
-            case 4: search_products(1); break;
+            case 1:
+                add_product();
+                break;
+            case 2:
+                update_product();
+                break;
+            case 3:
+                remove_product();
+                break;
+            case 4:
+                search_products(1);
+                break;
         }
     } while (choice != 0);
 }
 
+
 int main() {
+    system("color B0");
     printf("Welcome to the Ma Babar Dua Super Shop\n");
     load_data("products.dat", products, &product_count, sizeof(Product));
     load_data("users.dat", users, &user_count, sizeof(User));
@@ -314,3 +326,4 @@ int main() {
 
     return 0;
 }
+
