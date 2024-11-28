@@ -266,7 +266,7 @@ void checkout(int user_id) {
 void customer_menu(int user_id) {
     int choice;
     do {
-        printf("\n1. View Products\n2. Add to Cart\n3. View Cart\n4. Remove from Cart\n5. Checkout\n0. Logout\nChoice: ");
+        printf("\n                    1. View Products\n                    2. Add to Cart\n                    3. View Cart\n                    4. Remove from Cart\n                    5. Checkout\n0. Logout\nChoice: ");
         scanf("%d", &choice);
         switch (choice) {
             case 1: search_products(1); break;
@@ -281,7 +281,7 @@ void customer_menu(int user_id) {
 void admin_menu() {
     int choice;
     do {
-        printf("\n1. Add Product\n2. Update Product\n3. Remove Product\n4. View Products\n0. Logout\nChoice: ");
+        printf("\n                    1. Add Product\n                    2. Update Product\n                    3. Remove Product\n                    4. View Products\n0. Logout\nChoice: ");
         scanf("%d", &choice);
         switch (choice) {
             case 1:
@@ -303,14 +303,15 @@ void admin_menu() {
 
 int main() {
     system("color B0");
-    printf("Welcome to the Ma Babar Dua Super Shop\n");
+    printf("                     ----------Welcome to OUR SUPER SHOP-----------\n          ");
+     printf("                  !!For the best!For the better!!\n          ");
     load_data("products.dat", products, &product_count, sizeof(Product));
     load_data("users.dat", users, &user_count, sizeof(User));
     load_initial_products();
 
     int choice;
     do {
-        printf("\n1. Register\n2. Customer Login\n3. Admin Login\n0. Exit\nChoice: ");
+        printf("\n                    1.Register\n                    2. Customer Login\n                    3. Admin Login\n                    0. Exit\n                    Choice: ");
         scanf("%d", &choice);
         switch (choice) {
             case 1: register_user(); break;
