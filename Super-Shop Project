@@ -70,10 +70,8 @@ void add_product() {
     scanf(" %[^\n]", p->name);
     printf("Enter description: ");
     scanf(" %[^\n]", p->description);
-    printf("Enter price: ");
-    scanf("%f %d", &p->price);
-    printf("Enter quantity: ");
-    scanf("%f %d",&p->quantity);
+    printf("Enter price and quantity: ");
+    scanf("%f %d", &p->price, &p->quantity);
     p->available = p->quantity;
     save_data("products.dat", products, product_count, sizeof(Product));
 }
@@ -148,6 +146,7 @@ void register_user() {
     scanf("%s", u->username);
     printf("Enter password: ");
     scanf("%s", u->password);
+    printf("Registration Successfull");
     save_data("users.dat", users, user_count, sizeof(User));
 }
 
